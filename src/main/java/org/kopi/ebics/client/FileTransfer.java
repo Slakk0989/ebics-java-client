@@ -23,9 +23,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.logging.Logger;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.interfaces.EbicsOrderType;
@@ -80,7 +79,7 @@ import org.kopi.ebics.xml.UploadTransferRequestElement;
  *
  */
 public class FileTransfer {
-    private static final Logger logger = LogManager.getLogger(EbicsClient.class);
+    private static final Logger logger = Logger.getLogger(EbicsClient.class.toString());
   /**
    * Constructs a new FileTransfer session
    * @param session the user session

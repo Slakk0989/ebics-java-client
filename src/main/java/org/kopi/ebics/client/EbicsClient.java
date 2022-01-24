@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -40,8 +42,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.NoDownloadDataAvailableException;
@@ -78,7 +78,7 @@ public class EbicsClient {
         System.setProperty("ebicsBasePath", getRootDir().getAbsolutePath());
     }
 
-    private static final Logger logger = LogManager.getLogger(EbicsClient.class);
+    private static final Logger logger = Logger.getLogger(EbicsClient.class.toString());
     private final Configuration configuration;
     private final Map<String, User> users = new HashMap<>();
     private final Map<String, Partner> partners = new HashMap<>();
@@ -221,7 +221,7 @@ public class EbicsClient {
             logger.info(messages.getString("user.create.success", userId));
             return user;
         } catch (Exception e) {
-            logger.error(messages.getString("user.create.error"), e);
+            logger.log(Level.SEVERE, messages.getString("user.create.error"), e);
             throw e;
         }
     }
@@ -272,7 +272,7 @@ public class EbicsClient {
             logger.info(messages.getString("user.load.success", userId));
             return user;
         } catch (Exception e) {
-            logger.error(messages.getString("user.load.error"), e);
+            logger.log(Level.SEVERE, messages.getString("user.load.error"), e);
             throw e;
         }
     }
@@ -300,7 +300,7 @@ public class EbicsClient {
             user.setInitialized(true);
             logger.info(messages.getString("ini.send.success", userId));
         } catch (Exception e) {
-            logger.error(messages.getString("ini.send.error", userId), e);
+            logger.log(Level.SEVERE, messages.getString("ini.send.error", userId), e);
             throw e;
         }
     }
@@ -330,7 +330,7 @@ public class EbicsClient {
             keyManager.sendHIA(null);
             user.setInitializedHIA(true);
         } catch (Exception e) {
-            logger.error(messages.getString("hia.send.error", userId), e);
+            logger.log(Level.SEVERE, messages.getString("hia.send.error", userId), e);
             throw e;
         }
         logger.info(messages.getString("hia.send.success", userId));
@@ -353,7 +353,7 @@ public class EbicsClient {
             keyManager.sendHPB();
             logger.info(messages.getString("hpb.send.success", userId));
         } catch (Exception e) {
-            logger.error(messages.getString("hpb.send.error", userId), e);
+            logger.log(Level.SEVERE, messages.getString("hpb.send.error", userId), e);
             throw e;
         }
     }
@@ -381,7 +381,7 @@ public class EbicsClient {
         try {
             keyManager.lockAccess();
         } catch (Exception e) {
-            logger.error(messages.getString("spr.send.error", userId), e);
+            logger.log(Level.SEVERE, messages.getString("spr.send.error", userId), e);
             throw e;
         }
 
@@ -404,8 +404,7 @@ public class EbicsClient {
         try {
             transferManager.sendFile(IOUtils.getFileContent(file), orderType, orderAttribute);
         } catch (IOException | EbicsException e) {
-            logger
-                .error(messages.getString("upload.file.error", file.getAbsolutePath()), e);
+            logger.log(Level.SEVERE, messages.getString("upload.file.error", file.getAbsolutePath()), e);
             throw e;
         }
     }
@@ -433,7 +432,7 @@ public class EbicsClient {
             // don't log this exception as an error, caller can decide how to handle
             throw e;
         } catch (Exception e) {
-            logger.error(messages.getString("download.file.error"), e);
+            logger.log(Level.SEVERE, messages.getString("download.file.error"), e);
             throw e;
         }
     }
