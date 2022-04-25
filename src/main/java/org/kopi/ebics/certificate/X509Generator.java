@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
@@ -46,6 +47,7 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.kopi.ebics.utils.Utils;
@@ -235,15 +237,18 @@ public class X509Generator {
    * @throws IOException
    */
   private SubjectKeyIdentifier getSubjectKeyIdentifier(PublicKey publicKey)
-    throws IOException
-  {
-    InputStream			input;
-    SubjectPublicKeyInfo	keyInfo;
+	      throws IOException, NoSuchAlgorithmException {
 
-    input = new ByteArrayInputStream(publicKey.getEncoded());
-    keyInfo = SubjectPublicKeyInfo.getInstance((ASN1Sequence)new ASN1InputStream(input).readObject());
+	    InputStream input;
+	    SubjectPublicKeyInfo keyInfo;
 
-    return SubjectKeyIdentifier.getInstance(keyInfo);
+	    input = new ByteArrayInputStream(publicKey.getEncoded());
+	    try (final ASN1InputStream is = new ASN1InputStream(input)) {
+	      keyInfo = SubjectPublicKeyInfo.getInstance((ASN1Sequence) is.readObject());
+	    }
+
+	    final JcaX509ExtensionUtils jcaX509ExtensionUtils = new JcaX509ExtensionUtils();
+	    return jcaX509ExtensionUtils.createSubjectKeyIdentifier(keyInfo);
   }
 
   /**
